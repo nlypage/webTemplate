@@ -1,0 +1,48 @@
+services:
+  database:
+    container_name: database
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+    image: postgres:16.2-alpine3.19
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    volumes:
+      - database:/var/lib/postgresql/data
+    restart: always
+
+  backend:
+    container_name: backend
+    build: ./backend
+    restart: always
+    environment:
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - BACKEND_PORT=${BACKEND_PORT}
+    ports:
+      - "3000:3000"
+    depends_on:
+      database:
+        condition: service_healthy
+
+  frontend:
+    container_name: frontend
+    build: ./frontend
+    restart: always
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - node_modules:/app/node_modules
+
+volumes:
+  database:
+  node_modules:
