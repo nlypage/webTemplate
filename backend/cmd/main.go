@@ -3,6 +3,7 @@ package main
 import (
 	"webTemplate/cmd/app"
 	"webTemplate/internal/adapters/config"
+	"webTemplate/internal/adapters/controller/api/setup"
 )
 
 func main() {

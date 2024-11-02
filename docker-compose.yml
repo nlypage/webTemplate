@@ -43,6 +43,15 @@ services:
       - ./frontend:/app
       - node_modules:/app/node_modules
 
+  reverse-proxy:
+    image: traefik:latest
+    command: --providers.docker
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
 volumes:
   database:
   node_modules:
