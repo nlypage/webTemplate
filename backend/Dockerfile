@@ -4,7 +4,7 @@ RUN apk update && apk add ca-certificates git gcc g++ libc-dev binutils
 
 WORKDIR /opt
 
-COPY go.mod go.sum ./
+COPY go.mod ./
 RUN go mod download && go mod verify
 
 COPY . .
