@@ -5,6 +5,7 @@ on:
       - main
     paths:
       - backend
+      - .github/workflows/build-docker-backend.yml
 
 env:
   REGISTRY: ghcr.io
