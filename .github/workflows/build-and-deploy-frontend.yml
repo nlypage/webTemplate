@@ -34,7 +34,8 @@ jobs:
           key: ${{ runner.os }}-packages
 
       - name: Build and install deps
-        run: cd frontend && deno install && deno run build
+        working-directory: ./frontend
+        run: deno install && deno run build
 
       - name: Save packages to cache
         uses: actions/cache/save@v4
@@ -43,15 +44,11 @@ jobs:
           key: ${{ steps.restore.outputs.cache-primary-key }}
 
       - name: Create an archive
+        working-directory: ./frontend
         run: tar -czvf release.tar.gz -C dist .
 
-      - name: cd scripts
-        run: cd scripts
-
-      - name: Install deps
-        run: deno cache
-
       - name: Deploy
+        working-directory: ./frontend/scripts
         env:
           S3-ID: ${{ secrets.S3_ID }}
           S3-KEY: ${{ secrets.S3_KEY }}
@@ -66,7 +63,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          files: release.tar.gz
+          files: ./frontend/release.tar.gz
           tag_name: ${{ steps.short_hash.outputs.HASH }}
           name: Release ${{ steps.short_hash.outputs.HASH }}
           body: Release for commit ${{ steps.short_hash.outputs.HASH }}

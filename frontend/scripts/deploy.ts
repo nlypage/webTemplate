@@ -15,7 +15,11 @@ const bucket = s3.getBucket(Deno.env.get("S3-NAME")!);
 for await (const entry of walk("../dist/")) {
     if (entry.isFile) {
         const filePath = entry.path;
-        const fileRelativePath = filePath.replace(/\\/g, '/').replace("dist/", '');
+        let fileRelativePath = filePath.replace(/\\/g, '/').replace("..", '').replace("dist/", '');
+
+        if (fileRelativePath.startsWith("/")) {
+            fileRelativePath = fileRelativePath.substring(1)
+        }
 
         const body = await Deno.readFile(filePath);
         console.log(`uploading ${fileRelativePath}`)
