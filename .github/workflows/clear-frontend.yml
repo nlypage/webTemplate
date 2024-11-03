@@ -1,0 +1,32 @@
+name: clear-frontend.yml
+on:
+  workflow_dispatch:
+
+
+jobs:
+  clear:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: CD
+        run: cd frontend/scripts
+
+      - name: Install Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Install deps
+        run: deno cache
+
+      - name: Clear assets
+        env:
+          S3-ID: ${{ secrets.S3-ID }}
+          S3-KEY: ${{ secrets.S3-KEY }}
+          S3-REGION: ${{ secrets.S3-REGION }}
+          S3-URL: ${{ secrets.S3-URL }}
+          S3-NAME: ${{ secrets.S3-NAME }}
+        run: deno task clear

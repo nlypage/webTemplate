@@ -13,16 +13,6 @@ jobs:
     permissions:
       contents: write
       packages: write
-      pages: write
-      id-token: write
-
-    concurrency:
-      group: 'pages'
-      cancel-in-progress: true
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repository
@@ -52,20 +42,28 @@ jobs:
           path: node_modules
           key: ${{ steps.restore.outputs.cache-primary-key }}
 
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
-
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: './dist'
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
       - name: Create an archive
         run: tar -czvf release.tar.gz -C dist .
+
+      - name: cd scripts
+        run: cd scripts
+
+      - name: Install deps
+        run: deno cache
+
+      - name: Deploy
+        env:
+          S3-ID: ${{ secrets.S3-ID }}
+          S3-KEY: ${{ secrets.S3-KEY }}
+          S3-REGION: ${{ secrets.S3-REGION }}
+          S3-URL: ${{ secrets.S3-URL }}
+          S3-NAME: ${{ secrets.S3-NAME }}
+        run: deno task deploy
 
       - name: Publish Release
         id: publish_release

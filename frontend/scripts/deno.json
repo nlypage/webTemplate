@@ -1,0 +1,11 @@
+{
+  "tasks": {
+    "deploy": "deno -RN deploy.ts",
+    "clear": "deno -N clear.ts"
+  },
+  "imports": {
+    "@std/fs": "jsr:@std/fs@^1.0.5",
+    "@std/media-types": "jsr:@std/media-types@^1.0.3",
+    "@std/path": "jsr:@std/path@^1.0.8"
+  }
+}
