@@ -24,9 +24,9 @@ jobs:
 
       - name: Clear assets
         env:
-          S3-ID: ${{ secrets.S3-ID }}
-          S3-KEY: ${{ secrets.S3-KEY }}
-          S3-REGION: ${{ secrets.S3-REGION }}
-          S3-URL: ${{ secrets.S3-URL }}
-          S3-NAME: ${{ secrets.S3-NAME }}
+          S3-ID: ${{ secrets.S3_ID }}
+          S3-KEY: ${{ secrets.S3_KEY }}
+          S3-REGION: ${{ secrets.S3_REGION }}
+          S3-URL: ${{ secrets.S3_URL }}
+          S3-NAME: ${{ secrets.S3_NAME }}
         run: deno task clear
