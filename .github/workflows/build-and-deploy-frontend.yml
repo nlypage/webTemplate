@@ -42,11 +42,6 @@ jobs:
           path: node_modules
           key: ${{ steps.restore.outputs.cache-primary-key }}
 
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: './dist'
-
       - name: Create an archive
         run: tar -czvf release.tar.gz -C dist .
 
