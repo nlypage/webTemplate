@@ -17,8 +17,7 @@ services:
     restart: always
 
   backend:
-    container_name: backend
-    build: ./backend
+    image: "insert github repo here"
     restart: always
     env_file:
       - .env
@@ -30,7 +29,7 @@ services:
 
   cf:
     image: cloudflare/cloudflared
-    restart: unless-stopped
+    restart: always
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=TOKEN

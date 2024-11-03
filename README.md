@@ -1,12 +1,23 @@
 # Web Template
 
-Simple web application template for Go.
+Simple web application template for Go + React.
 
 ## Libraries used:
 - Fiber
 - Gorm (PGSQL)
 - Viper
 - Zap
+- React
+
+## Running
+```shell
+# frontend with Deno
+cd frontend && deno run dev
+
+# backend with Docker
+# update .env and docker-compose.yml variables
+docker compose up -d
+```
 
 ## OpenAPI Docs
 ```shell
