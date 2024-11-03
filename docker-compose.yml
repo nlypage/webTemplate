@@ -33,5 +33,10 @@ services:
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=TOKEN
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 volumes:
   database:
