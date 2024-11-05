@@ -4,7 +4,11 @@ on:
     branches:
       - main
     paths:
-      - backend
+      - cmd
+      - internal
+      - Dockerfile
+      - go.mod
+      - go.sum
       - .github/workflows/build-docker-backend.yml
 
 env:

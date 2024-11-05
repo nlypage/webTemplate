@@ -14,15 +14,19 @@ services:
       start_period: 5s
     volumes:
       - database:/var/lib/postgresql/data
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
     restart: always
 
   backend:
-    image: "insert github repo here"
+    image: ghcr.io/linuxfight/webtemplate:main
     restart: always
     env_file:
       - .env
     expose:
       - "3000:3000"
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"
     depends_on:
       database:
         condition: service_healthy
@@ -33,9 +37,13 @@ services:
     command: tunnel --no-autoupdate run
     environment:
       - TUNNEL_TOKEN=TOKEN
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
 
   watchtower:
     image: containrrr/watchtower
+    labels:
+      - "com.centurylinklabs.watchtower.enable=false"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 volumes:
