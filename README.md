@@ -11,7 +11,7 @@ Simple web application template for Go.
 ## Running
 ```shell
 # backend with Docker
-# update .env and docker-compose.yml variables
+# update .env and compose.yml variables
 docker compose up -d
 ```
 

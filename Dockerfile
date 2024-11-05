@@ -15,6 +15,7 @@ RUN apk update && apk add ca-certificates libc6-compat openssh bash && rm -rf /v
 
 WORKDIR /opt
 
+COPY config.yaml /opt/bin
 COPY --from=builder /opt/bin/application ./
 
 EXPOSE 3000

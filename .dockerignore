@@ -3,4 +3,5 @@
 README.md
 .git
 .github
-docker-compose.yml
+compose.yml
+config
