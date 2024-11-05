@@ -9,7 +9,7 @@ RUN go mod download && go mod verify
 
 COPY . .
 
-RUN go build -o bin/application ./cmd/app
+RUN go build -o bin/application ./cmd
 
 FROM alpine:3.19 AS runner
 
