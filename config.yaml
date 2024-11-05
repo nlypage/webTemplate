@@ -1,10 +1,10 @@
 service: # изменять в случае изменений в .env
   database:
-    host: "app-database"
-    user: "app-user"
-    password: "super-strong-password"
-    port: 5400
-    name: "app"
+    host: "database"
+    user: "user"
+    password: "average_password"
+    port: 5432
+    name: "db"
     ssl-mode: "disable"
 
 #  redis:
@@ -16,7 +16,8 @@ service: # изменять в случае изменений в .env
     certificate:
       cert-file: "/etc/letsencrypt/live/npm-1/fullchain.pem"
       key-file: "/etc/letsencrypt/live/npm-1/privkey.pem"
-      port: 8080
+
+    port: 3000
 
     jwt:
       secret: "super-strong-secret"
@@ -24,6 +25,6 @@ service: # изменять в случае изменений в .env
       refresh-token-expiration: "43200" #  30 дней в минутах
 
 settings:
-  debug: false # включение / выключение дебага
+  debug: true # включение / выключение дебага
   listen-tls: false # false - http, true - https (при первом старте до выпуска сертификатов - ставить false, после - true)
   timezone: "GMT+3" # часовой пояс в формате "GMT+3"

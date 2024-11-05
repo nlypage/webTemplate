@@ -40,14 +40,15 @@ func New(config *config.Config) *App {
 func (a *App) Start() {
 	if viper.GetBool("settings.listen-tls") {
 		if err := a.Fiber.ListenTLS(
-			":"+viper.GetString("settings.backend.port"),
+			":"+viper.GetString("service.backend.port"),
 			viper.GetString("service.backend.certificate.cert-file"),
 			viper.GetString("service.backend.certificate.key-file"),
 		); err != nil {
 			logger.Log.Panicf("failed to start listen (with tls): %v", err)
 		}
 	} else {
-		if err := a.Fiber.Listen(":" + viper.GetString("settings.backend.port")); err != nil {
+		logger.Log.Debugf("port: %s", viper.GetString("service.backend.port"))
+		if err := a.Fiber.Listen(":" + viper.GetString("service.backend.port")); err != nil {
 			logger.Log.Panicf("failed to start listen (no tls): %v", err)
 		}
 	}
