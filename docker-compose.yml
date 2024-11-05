@@ -17,7 +17,10 @@ services:
     restart: always
 
   backend:
-    image: "insert github repo here"
+#    image: "insert github repo here"
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
     restart: always
     env_file:
       - .env
@@ -27,11 +30,11 @@ services:
       database:
         condition: service_healthy
 
-  cf:
-    image: cloudflare/cloudflared
-    restart: always
-    command: tunnel --no-autoupdate run
-    environment:
-      - TUNNEL_TOKEN=TOKEN
+#  cf:
+#    image: cloudflare/cloudflared
+#    restart: always
+#    command: tunnel --no-autoupdate run
+#    environment:
+#      - TUNNEL_TOKEN=TOKEN
 volumes:
   database:
