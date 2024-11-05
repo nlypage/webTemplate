@@ -4,7 +4,12 @@ on:
     branches:
       - main
     paths:
-      - backend
+      - cmd
+      - internal
+      - Dockerfile
+      - go.mod
+      - go.sum
+      - .github/workflows/build-docker-backend.yml
 
 env:
   REGISTRY: ghcr.io
@@ -40,7 +45,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
-          context: backend
+          context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

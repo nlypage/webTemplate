@@ -1,0 +1,7 @@
+.env
+.gitignore
+README.md
+.git
+.github
+compose.yml
+config
