@@ -23,23 +23,25 @@ func Setup(app *app.App) {
 		})
 	})
 
-	// Setup api v1 routes
-	apiV1 := app.Fiber.Group("/api/v1")
+	/*
+		// Setup api v1 routes
+		apiV1 := app.Fiber.Group("/api/v1")
 
-	middlewareHandler := middlewares.NewMiddlewareHandler(app)
+		middlewareHandler := middlewares.NewMiddlewareHandler(app)
 
-	// Setup user routes
-	userHandler := v1.NewUserHandler(app)
-	userHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
+		// Setup user routes
+		userHandler := v1.NewUserHandler(app)
+		userHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
 
-	// Setup question routes
-	questionHandler := v1.NewQuestionHandler(app)
-	questionHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
+		// Setup question routes
+		questionHandler := v1.NewQuestionHandler(app)
+		questionHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
 
-	// Setup conference routes
-	conferenceHandler := v1.NewConferenceHandler(app)
-	conferenceHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
+		// Setup conference routes
+		conferenceHandler := v1.NewConferenceHandler(app)
+		conferenceHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
 
-	eventHandler := v1.NewEventHandler(app)
-	eventHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
+		eventHandler := v1.NewEventHandler(app)
+		eventHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
+	*/
 }
