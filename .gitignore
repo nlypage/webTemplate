@@ -1,6 +1,3 @@
-node_modules
-deno.lock
-dist
-
+.idea
 *.exe
 *.dll
