@@ -16,6 +16,7 @@ type User struct {
 	Password      []byte  `json:"-"`
 	Role          string  `json:"role" gorm:"default:user;not null"`
 	Token         []Token `json:"-" gorm:"foreignKey:user_id;references:id"`
+	Username      string  `json:"username"`
 }
 
 // HashedPassword is a function to hash the password.

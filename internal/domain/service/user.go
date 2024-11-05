@@ -16,15 +16,15 @@ type userStorage interface {
 	GetByEmail(ctx context.Context, email string) (*entity.User, error)
 }
 
-type UserService struct {
+type userService struct {
 	storage userStorage
 }
 
-func NewUserService(storage userStorage) *UserService {
-	return &UserService{storage: storage}
+func NewUserService(storage userStorage) *userService {
+	return &userService{storage: storage}
 }
 
-func (s *UserService) Create(ctx context.Context, registerReq dto.UserRegister) (*entity.User, error) {
+func (s *userService) Create(ctx context.Context, registerReq dto.UserRegister) (*entity.User, error) {
 	if _, err := s.storage.GetByEmail(ctx, registerReq.Email); err == nil {
 		return nil, errorz.EmailAlreadyExists
 	}
@@ -36,6 +36,6 @@ func (s *UserService) Create(ctx context.Context, registerReq dto.UserRegister) 
 	return s.storage.Create(ctx, user)
 }
 
-func (s *UserService) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
+func (s *userService) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
 	return s.storage.GetByEmail(ctx, email)
 }

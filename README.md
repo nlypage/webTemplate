@@ -23,5 +23,5 @@ go install github.com/swaggo/swag/cmd/swag@latest
 
 # 2. Generate docs
 # add this to your build configuration to regenerate it automatically
-swag init
+swag init -g cmd/main.go
 ```

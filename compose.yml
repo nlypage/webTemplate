@@ -19,7 +19,10 @@ services:
     restart: always
 
   backend:
-    image: ghcr.io/linuxfight/webtemplate:main
+#    image: ghcr.io/linuxfight/webtemplate:main
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: always
     env_file:
       - .env
@@ -31,20 +34,20 @@ services:
       database:
         condition: service_healthy
 
-  cf:
-    image: cloudflare/cloudflared
-    restart: always
-    command: tunnel --no-autoupdate run
-    environment:
-      - TUNNEL_TOKEN=TOKEN
-    labels:
-      - "com.centurylinklabs.watchtower.enable=false"
-
-  watchtower:
-    image: containrrr/watchtower
-    labels:
-      - "com.centurylinklabs.watchtower.enable=false"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+#  cf:
+#    image: cloudflare/cloudflared
+#    restart: always
+#    command: tunnel --no-autoupdate run
+#    environment:
+#      - TUNNEL_TOKEN=TOKEN
+#    labels:
+#      - "com.centurylinklabs.watchtower.enable=false"
+#
+#  watchtower:
+#    image: containrrr/watchtower
+#    labels:
+#      - "com.centurylinklabs.watchtower.enable=false"
+#    volumes:
+#      - /var/run/docker.sock:/var/run/docker.sock
 volumes:
   database:
