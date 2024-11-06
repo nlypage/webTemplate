@@ -3,16 +3,12 @@ on:
   push:
     branches:
       - main
-    paths:
-      - cmd
-      - internal
-      - Dockerfile
-      - config.yaml
+    paths-ignore:
+      - .env
       - compose.yml
-      - .dockerignore
-      - go.mod
-      - go.sum
-      - .github/workflows/build-docker-backend.yml
+      - dev-compose.yml
+      - README.md
+      - .gitignore
 
 env:
   REGISTRY: ghcr.io
