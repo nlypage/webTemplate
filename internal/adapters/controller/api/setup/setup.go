@@ -14,8 +14,8 @@ func Setup(app *app.App) {
 
 	app.Fiber.Use(swagger.New(swagger.Config{
 		BasePath: "/api/v1",
-		FilePath: "../../../../../docs/swagger.json",
-		Path:     "docs",
+		FilePath: "./docs/swagger.json",
+		Path:     "./docs",
 		Title:    "Swagger API Docs",
 	}))
 
