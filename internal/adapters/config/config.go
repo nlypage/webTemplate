@@ -65,6 +65,7 @@ func Configure() *Config {
 		viper.GetString("settings.timezone"),
 	)
 
+	logger.Log.Debugf("dsn: %s", dsn)
 	logger.Log.Debug("Connecting to postgres...")
 	database, errConnect := gorm.Open(postgres.Open(dsn), gormConfig)
 	if errConnect != nil {
