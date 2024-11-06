@@ -11,7 +11,7 @@ import (
 
 type TokenStorage interface {
 	Create(ctx context.Context, token entity.Token) (*entity.Token, error)
-	GetByUserID(ctx context.Context, userID string) (*entity.Token, error)
+	GetByUserID(ctx context.Context, userID string, tokenType string) (*entity.Token, error)
 	DeleteAll(ctx context.Context, userID string) error
 	Delete(ctx context.Context, userID string, tokenType string) error
 }
