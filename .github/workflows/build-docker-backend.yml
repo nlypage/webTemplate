@@ -7,6 +7,9 @@ on:
       - cmd
       - internal
       - Dockerfile
+      - config.yaml
+      - compose.yml
+      - .dockerignore
       - go.mod
       - go.sum
       - .github/workflows/build-docker-backend.yml

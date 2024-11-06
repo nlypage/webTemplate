@@ -11,7 +11,14 @@ Simple web application template for Go.
 ## Running
 ```shell
 # backend with Docker
-# update .env and compose.yml variables
+# update .env and dev-compose.yml variables
+docker compose -f ./dev-compose.yml up --build
+```
+
+## PROD
+Don't forget to update .env and config.yml.
+Also login to ghcr.io and update volumes for watchtower.
+```shell
 docker compose up -d
 ```
 
