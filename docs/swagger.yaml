@@ -1,0 +1,99 @@
+basePath: /api/v1
+definitions:
+  dto.AuthTokens:
+    properties:
+      access:
+        $ref: '#/definitions/dto.Token'
+      refresh:
+        $ref: '#/definitions/dto.Token'
+    type: object
+  dto.HTTPError:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
+  dto.Token:
+    properties:
+      expires:
+        type: string
+      token:
+        type: string
+    type: object
+  dto.UserRegister:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  dto.UserRegisterResponse:
+    properties:
+      tokens:
+        $ref: '#/definitions/dto.AuthTokens'
+      user:
+        $ref: '#/definitions/dto.UserReturn'
+    type: object
+  dto.UserReturn:
+    properties:
+      email:
+        type: string
+      id:
+        type: string
+      role:
+        type: string
+      username:
+        type: string
+      verified_email:
+        type: boolean
+    type: object
+host: localhost:3000
+info:
+  contact: {}
+  description: This is a webtemplate API that contains project dir structure, JWT
+    auth, basic user entitites and can be further expanded.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  title: WebTemplate API
+  version: "1.0"
+paths:
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Register a new user using his email, username and password. Returns
+        his ID, email, username, verifiedEmail boolean variable and role
+      parameters:
+      - description: User registration body object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserRegister'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserRegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+      summary: Register a new user
+      tags:
+      - user
+swagger: "2.0"
