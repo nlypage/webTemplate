@@ -108,6 +108,7 @@ func (h UserHandler) register(c *fiber.Ctx) error {
 // @Param        body body  dto.UserLogin true  "User login body object"
 // @Success      200  {object}  dto.UserRegisterResponse
 // @Failure      400  {object}  dto.HTTPError
+// @Failure      403  {object}  dto.HTTPError
 // @Failure      404  {object}  dto.HTTPError
 // @Failure      500  {object}  dto.HTTPError
 // @Router       /user/login [post]
@@ -133,6 +134,14 @@ func (h UserHandler) login(c *fiber.Ctx) error {
 		return c.Status(fiber.StatusNotFound).JSON(dto.HTTPError{
 			Code:    fiber.StatusNotFound,
 			Message: "not found",
+		})
+	}
+
+	passErr := user.ComparePassword(userDTO.Password)
+	if passErr != nil {
+		return c.Status(fiber.StatusForbidden).JSON(dto.HTTPError{
+			Code:    fiber.StatusForbidden,
+			Message: "invalid password",
 		})
 	}
 

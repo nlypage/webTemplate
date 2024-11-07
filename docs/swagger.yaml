@@ -99,6 +99,10 @@ paths:
           description: Bad Request
           schema:
             $ref: '#/definitions/dto.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
         "404":
           description: Not Found
           schema:
@@ -108,6 +112,40 @@ paths:
           schema:
             $ref: '#/definitions/dto.HTTPError'
       summary: Login to existing user account.
+      tags:
+      - user
+  /user/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Get a new access token using a valid refresh token
+      parameters:
+      - description: Access token object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Token'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+      summary: Refresh the access token
       tags:
       - user
   /user/register:
