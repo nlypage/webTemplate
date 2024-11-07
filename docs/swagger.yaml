@@ -21,6 +21,16 @@ definitions:
       token:
         type: string
     type: object
+  dto.UserLogin:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    required:
+    - email
+    - password
+    type: object
   dto.UserRegister:
     properties:
       email:
@@ -65,6 +75,41 @@ info:
   title: WebTemplate API
   version: "1.0"
 paths:
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: Login to existing user account using his email, username and password.
+        Returns his ID, email, username, verifiedEmail boolean variable and role
+      parameters:
+      - description: User login body object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserLogin'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.UserRegisterResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+      summary: Login to existing user account.
+      tags:
+      - user
   /user/register:
     post:
       consumes:
@@ -81,8 +126,8 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
-          description: OK
+        "201":
+          description: Created
           schema:
             $ref: '#/definitions/dto.UserRegisterResponse'
         "400":
