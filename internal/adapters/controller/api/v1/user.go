@@ -43,7 +43,7 @@ func NewUserHandler(app *app.App) *UserHandler {
 // @Accept       json
 // @Produce      json
 // @Param        body body  dto.UserRegister true  "User registration body object"
-// @Success      200  {object}  dto.UserRegisterResponse
+// @Success      201  {object}  dto.UserRegisterResponse
 // @Failure      400  {object}  dto.HTTPError
 // @Failure      500  {object}  dto.HTTPError
 // @Router       /user/register [post]
