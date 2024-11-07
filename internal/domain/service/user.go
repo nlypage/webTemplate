@@ -30,7 +30,8 @@ func (s *userService) Create(ctx context.Context, registerReq dto.UserRegister) 
 	}
 
 	user := entity.User{
-		Email: registerReq.Email,
+		Email:    registerReq.Email,
+		Username: registerReq.Username,
 	}
 	user.SetPassword(registerReq.Password)
 	return s.storage.Create(ctx, user)

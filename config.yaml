@@ -1,6 +1,6 @@
 service: # изменять в случае изменений в .env
   database:
-    host: "database"
+    host: "localhost"
     user: "user"
     password: "average_password"
     port: 5432
