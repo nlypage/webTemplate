@@ -4,4 +4,6 @@ README.md
 .git
 .github
 compose.yml
+dev-compose.yml
+pg-compose.yml
 config
