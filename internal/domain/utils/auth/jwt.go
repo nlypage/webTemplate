@@ -6,16 +6,13 @@ import (
 	"github.com/spf13/viper"
 	"strings"
 	"time"
+	"webTemplate/internal/domain/common/errorz"
 )
 
-func VerifyToken(tokenStr, secret, tokenType string) (string, error) {
-	tokenParts := strings.Split(tokenStr, " ")
-	if len(tokenParts) != 2 {
-		return "", errors.New("token format error")
-	}
-
-	if tokenParts[0] != "Bearer" {
-		return "", errors.New("token format error")
+func VerifyToken(authHeader, secret, tokenType string) (string, error) {
+	tokenStr := strings.TrimSpace(strings.TrimPrefix(authHeader, "Bearer "))
+	if tokenStr == "" {
+		return "", errorz.AuthHeaderIsEmpty
 	}
 
 	token, err := jwt.Parse(tokenStr, func(_ *jwt.Token) (interface{}, error) {

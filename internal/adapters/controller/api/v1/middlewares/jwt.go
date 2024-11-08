@@ -5,6 +5,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 	"webTemplate/cmd/app"
+	"webTemplate/internal/adapters/config"
 	"webTemplate/internal/adapters/database/postgres"
 	"webTemplate/internal/domain/common/errorz"
 	"webTemplate/internal/domain/entity"
@@ -32,42 +33,35 @@ func NewMiddlewareHandler(app *app.App) *MiddlewareHandler {
 
 // IsAuthenticated is a function that checks whether the user has sufficient rights to access the endpoint
 /*
- * c *fiber.Ctx - request context
- * role string - the user role required for access
  * tokenType string - the type of token that is required to access the endpoint
+ * requiredRights ...string - the rights that the user must have
  */
-func (h MiddlewareHandler) IsAuthenticated(c *fiber.Ctx, role string, tokenType string) error {
-	if len(c.GetReqHeaders()["Authorization"]) == 0 {
-		return errorz.AuthHeaderIsEmpty
-	}
+func (h MiddlewareHandler) IsAuthenticated(tokenType string, requiredRights ...string) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		authHeader := c.Get("Authorization")
 
-	authHeader := c.GetReqHeaders()["Authorization"][0]
-	if authHeader == "" {
-		return errorz.AuthHeaderIsEmpty
-	}
+		id, errVerify := auth.VerifyToken(authHeader, viper.GetString("service.backend.jwt.secret"), tokenType)
+		if errVerify != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"success": false,
+				"message": errVerify.Error(),
+			})
+		}
 
-	id, errVerify := auth.VerifyToken(authHeader, viper.GetString("service.backend.jwt.secret"), tokenType)
-	if errVerify != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"success": false,
-			"message": errVerify.Error(),
-		})
-	}
+		user, errGetUser := h.userService.GetByID(c.Context(), id)
+		if errGetUser != nil {
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+				"success": false,
+				"message": errGetUser.Error(),
+			})
+		}
 
-	user, errGetUser := h.userService.GetByID(c.Context(), id)
-	if errGetUser != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"success": false,
-			"message": errGetUser.Error(),
-		})
+		if !config.RoleHasRights(user.Role, requiredRights) {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"success": false,
+				"message": errorz.Forbidden,
+			})
+		}
+		return c.Next()
 	}
-
-	if user.Role != role {
-		return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
-			"success": false,
-			"message": errorz.Forbidden.Error(),
-		})
-	}
-	return c.Next()
-
 }
