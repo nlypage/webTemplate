@@ -14,12 +14,26 @@ definitions:
       message:
         type: string
     type: object
+  dto.HTTPStatus:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
   dto.Token:
     properties:
       expires:
         type: string
       token:
         type: string
+    type: object
+  dto.UserCode:
+    properties:
+      code:
+        type: string
+    required:
+    - code
     type: object
   dto.UserLogin:
     properties:
@@ -179,4 +193,50 @@ paths:
       summary: Register a new user
       tags:
       - user
+  /user/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify a user account with a code, sent to user's email
+      parameters:
+      - description: User's email code
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UserCode'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HTTPStatus'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+      security:
+      - Bearer: []
+      summary: Verify user account
+      tags:
+      - user
+securityDefinitions:
+  Bearer:
+    description: '"Type ''Bearer TOKEN'' to correctly set the API Key"'
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"

@@ -2,12 +2,14 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"github.com/spf13/viper"
 	"time"
 	"webTemplate/cmd/app"
 	"webTemplate/internal/adapters/controller/api/validator"
 	"webTemplate/internal/adapters/database/postgres"
+	"webTemplate/internal/adapters/logger"
 	"webTemplate/internal/domain/dto"
 	"webTemplate/internal/domain/entity"
 	"webTemplate/internal/domain/service"
@@ -15,7 +17,9 @@ import (
 )
 
 type UserService interface {
-	Create(ctx context.Context, registerReq dto.UserRegister) (*entity.User, error)
+	Create(ctx context.Context, registerReq dto.UserRegister, code string) (*entity.User, error)
+	GetByID(ctx context.Context, uuid string) (*entity.User, error)
+	Update(ctx context.Context, user *entity.User) (*entity.User, error)
 	GetByEmail(ctx context.Context, email string) (*entity.User, error)
 }
 
@@ -24,9 +28,15 @@ type TokenService interface {
 	GenerateToken(ctx context.Context, userID string, expires time.Time, tokenType string) (*entity.Token, error)
 }
 
+type EmailService interface {
+	Send(ctx context.Context, email string, text string, subject string) error
+	Check(ctx context.Context, email string) (bool, error)
+}
+
 type UserHandler struct {
 	userService  UserService
 	tokenService TokenService
+	emailService EmailService
 	validator    *validator.Validator
 }
 
@@ -37,6 +47,7 @@ func NewUserHandler(app *app.App) *UserHandler {
 	return &UserHandler{
 		userService:  service.NewUserService(userStorage),
 		tokenService: service.NewTokenService(tokenStorage),
+		emailService: service.NewEmailService(app.Maileroo),
 		validator:    app.Validator,
 	}
 }
@@ -69,7 +80,26 @@ func (h UserHandler) register(c *fiber.Ctx) error {
 		})
 	}
 
-	user, errCreate := h.userService.Create(c.Context(), userDTO)
+	mailValid, mvErr := h.emailService.Check(c.Context(), userDTO.Email)
+	if mvErr != nil || !mailValid {
+		logger.Log.Errorf("invalid email: %s", userDTO.Email)
+		return c.Status(fiber.StatusBadRequest).JSON(dto.HTTPError{
+			Code:    fiber.StatusBadRequest,
+			Message: "invalid email",
+		})
+	}
+
+	code := auth.GenerateCode()
+	msErr := h.emailService.Send(c.Context(), userDTO.Email, fmt.Sprintf("Your code is: <b>%s</b>", code), "Verification Code")
+	if msErr != nil {
+		logger.Log.Errorf("email sending error: %s", msErr.Error())
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.HTTPError{
+			Code:    fiber.StatusInternalServerError,
+			Message: msErr.Error(),
+		})
+	}
+
+	user, errCreate := h.userService.Create(c.Context(), userDTO, code)
 	if errCreate != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(dto.HTTPError{
 			Code:    fiber.StatusInternalServerError,
@@ -116,20 +146,20 @@ func (h UserHandler) login(c *fiber.Ctx) error {
 	var userDTO dto.UserLogin
 
 	if err := c.BodyParser(&userDTO); err != nil {
-    return c.Status(fiber.StatusBadRequest).JSON(dto.HTTPError{
+		return c.Status(fiber.StatusBadRequest).JSON(dto.HTTPError{
 			Code:    fiber.StatusBadRequest,
 			Message: err.Error(),
 		})
 	}
-  
+
 	if errValidate := h.validator.ValidateData(userDTO); errValidate != nil {
-    return c.Status(fiber.StatusBadRequest).JSON(dto.HTTPError{
+		return c.Status(fiber.StatusBadRequest).JSON(dto.HTTPError{
 			Code:    fiber.StatusBadRequest,
 			Message: errValidate.Error(),
 		})
 	}
-  
-  user, errFetch := h.userService.GetByEmail(c.Context(), userDTO.Email)
+
+	user, errFetch := h.userService.GetByEmail(c.Context(), userDTO.Email)
 	if errFetch != nil {
 		return c.Status(fiber.StatusNotFound).JSON(dto.HTTPError{
 			Code:    fiber.StatusNotFound,
@@ -162,7 +192,7 @@ func (h UserHandler) login(c *fiber.Ctx) error {
 			Role:          user.Role,
 		},
 		Tokens: *tokens,
-  }
+	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
 }
@@ -195,8 +225,8 @@ func (h UserHandler) refreshToken(c *fiber.Ctx) error {
 			Message: errValidate.Error(),
 		})
 	}
-  
-  userID, errToken := auth.VerifyToken(accessTokenDTO.Token, viper.GetString("service.backend.jwt.secret"), auth.TokenTypeAccess)
+
+	userID, errToken := auth.VerifyToken(accessTokenDTO.Token, viper.GetString("service.backend.jwt.secret"), auth.TokenTypeAccess)
 
 	if errToken != nil {
 		return c.Status(fiber.StatusUnauthorized).JSON(dto.HTTPError{
@@ -222,14 +252,86 @@ func (h UserHandler) refreshToken(c *fiber.Ctx) error {
 	response := dto.Token{
 		Token:   newAccess.Token,
 		Expires: expTime,
-  }
+	}
 
 	return c.Status(fiber.StatusOK).JSON(response)
 }
 
-func (h UserHandler) Setup(router fiber.Router) {
+// verify godoc
+// @Summary      Verify user account
+// @Description  Verify a user account with a code, sent to user's email
+// @Tags         user
+// @Accept       json
+// @Produce      json
+// @Security Bearer
+// @Param        body body  dto.UserCode true  "User's email code"
+// @Success      200  {object}  dto.HTTPStatus
+// @Failure      400  {object}  dto.HTTPError
+// @Failure      401  {object}  dto.HTTPError
+// @Failure      403  {object}  dto.HTTPError
+// @Failure      500  {object}  dto.HTTPError
+// @Router       /user/verify [post]
+func (h UserHandler) verify(c *fiber.Ctx) error {
+	var userCode dto.UserCode
+
+	if err := c.BodyParser(&userCode); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(dto.HTTPError{
+			Code:    fiber.StatusBadRequest,
+			Message: err.Error(),
+		})
+	}
+
+	if errValidate := h.validator.ValidateData(userCode); errValidate != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(dto.HTTPError{
+			Code:    fiber.StatusBadRequest,
+			Message: errValidate.Error(),
+		})
+	}
+
+	user, authErr := auth.GetUserFromJWT(c.Get("Authorization"), auth.TokenTypeAccess, c.Context(), h.userService.GetByID)
+
+	if authErr != nil {
+		return c.Status(fiber.StatusUnauthorized).JSON(dto.HTTPError{
+			Code:    fiber.StatusUnauthorized,
+			Message: authErr.Error(),
+		})
+	}
+
+	if user.VerificationCode == "NULL" {
+		return c.Status(fiber.StatusBadRequest).JSON(dto.HTTPError{
+			Code:    fiber.StatusBadRequest,
+			Message: "already verified",
+		})
+	}
+
+	if user.VerificationCode != userCode.Code {
+		return c.Status(fiber.StatusForbidden).JSON(dto.HTTPError{
+			Code:    fiber.StatusForbidden,
+			Message: "invalid code",
+		})
+	}
+
+	user.VerificationCode = "NULL"
+	_, updateErr := h.userService.Update(c.Context(), user)
+	if updateErr != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(dto.HTTPError{
+			Code:    fiber.StatusInternalServerError,
+			Message: updateErr.Error(),
+		})
+	}
+
+	response := dto.HTTPStatus{
+		Code:    200,
+		Message: "email verified",
+	}
+
+	return c.Status(fiber.StatusOK).JSON(response)
+}
+
+func (h UserHandler) Setup(router fiber.Router, middleware fiber.Handler) {
 	userGroup := router.Group("/user")
 	userGroup.Post("/register", h.register)
 	userGroup.Post("/login", h.login)
 	userGroup.Post("/refresh", h.refreshToken)
+	userGroup.Post("/verify", h.verify, middleware)
 }

@@ -2,7 +2,9 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"gorm.io/gorm"
+	"webTemplate/internal/domain/common/errorz"
 	"webTemplate/internal/domain/entity"
 )
 
@@ -18,6 +20,9 @@ func NewUserStorage(db *gorm.DB) *userStorage {
 
 // Create is a method to create a new User in database.
 func (s *userStorage) Create(ctx context.Context, user entity.User) (*entity.User, error) {
+	if err := s.db.WithContext(ctx).Where("email = ? AND verified_email = true", user.Email).Error; !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, errorz.EmailAlreadyTaken
+	}
 	err := s.db.WithContext(ctx).Create(&user).Error
 	return &user, err
 }

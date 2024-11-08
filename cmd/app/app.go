@@ -13,6 +13,7 @@ import (
 type App struct {
 	Fiber     *fiber.App
 	DB        *gorm.DB
+	Maileroo  config.MailerooConfig
 	Validator *validator.Validator
 }
 
@@ -32,6 +33,7 @@ func New(config *config.Config) *App {
 	return &App{
 		Fiber:     fiberApp,
 		DB:        config.Database,
+		Maileroo:  config.Maileroo,
 		Validator: validator.New(),
 	}
 }
