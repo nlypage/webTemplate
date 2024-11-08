@@ -3,31 +3,50 @@ definitions:
   dto.AuthTokens:
     properties:
       access:
-        $ref: '#/definitions/dto.Token'
+        allOf:
+        - $ref: '#/definitions/dto.Token'
+        description: Access token
       refresh:
-        $ref: '#/definitions/dto.Token'
+        allOf:
+        - $ref: '#/definitions/dto.Token'
+        description: Refresh token
     type: object
   dto.HTTPError:
     properties:
       code:
+        description: HTTP error code
+        example: 400
         type: integer
       message:
+        description: Error message
+        example: you are retard
         type: string
     type: object
   dto.Token:
     properties:
       expires:
+        description: Token expiration time in ISO 8601 format
+        example: "2024-12-08T10:00:12.961568771Z"
         type: string
       token:
+        description: Token string itself
+        example: somelong.token.string
         type: string
     type: object
   dto.UserRegister:
     properties:
       email:
+        description: Required, email must be valid
+        example: example@gmail.com
         type: string
       password:
+        description: 'Required, password must meet certain requirements: must has
+          upper case letters, lower case letters and digits'
+        example: Password1234
         type: string
       username:
+        description: Required, user's username
+        example: linuxflight
         type: string
     required:
     - email
@@ -37,21 +56,35 @@ definitions:
   dto.UserRegisterResponse:
     properties:
       tokens:
-        $ref: '#/definitions/dto.AuthTokens'
+        allOf:
+        - $ref: '#/definitions/dto.AuthTokens'
+        description: 'Two JWT tokens: Access token and Refresh token'
       user:
-        $ref: '#/definitions/dto.UserReturn'
+        allOf:
+        - $ref: '#/definitions/dto.UserReturn'
+        description: User object
     type: object
   dto.UserReturn:
     properties:
       email:
+        description: User's email
+        example: example@gmail.com
         type: string
       id:
+        description: User ID
+        example: "123"
         type: string
       role:
+        description: User's role (e.g. "Client", "Manager" etc)
+        example: manager
         type: string
       username:
+        description: User's username
+        example: linuxflight
         type: string
       verified_email:
+        description: Boll variable showing, whether user's email is verified or not
+        example: true
         type: boolean
     type: object
 host: localhost:3000
@@ -65,6 +98,40 @@ info:
   title: WebTemplate API
   version: "1.0"
 paths:
+  /user/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Get a new access token using a valid refresh token
+      parameters:
+      - description: Access token object
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Token'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+      summary: Refresh the access token
+      tags:
+      - user
   /user/register:
     post:
       consumes:

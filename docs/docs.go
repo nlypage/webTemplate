@@ -19,6 +19,58 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/user/refresh": {
+            "post": {
+                "description": "Get a new access token using a valid refresh token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Refresh the access token",
+                "parameters": [
+                    {
+                        "description": "Access token object",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.Token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.Token"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HTTPError"
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/user/register": {
             "post": {
                 "description": "Register a new user using his email, username and password. Returns his ID, email, username, verifiedEmail boolean variable and role",
@@ -71,10 +123,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "access": {
-                    "$ref": "#/definitions/dto.Token"
+                    "description": "Access token",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.Token"
+                        }
+                    ]
                 },
                 "refresh": {
-                    "$ref": "#/definitions/dto.Token"
+                    "description": "Refresh token",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.Token"
+                        }
+                    ]
                 }
             }
         },
@@ -82,10 +144,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "code": {
-                    "type": "integer"
+                    "description": "HTTP error code",
+                    "type": "integer",
+                    "example": 400
                 },
                 "message": {
-                    "type": "string"
+                    "description": "Error message",
+                    "type": "string",
+                    "example": "you are retard"
                 }
             }
         },
@@ -93,10 +159,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "expires": {
-                    "type": "string"
+                    "description": "Token expiration time in ISO 8601 format",
+                    "type": "string",
+                    "example": "2024-12-08T10:00:12.961568771Z"
                 },
                 "token": {
-                    "type": "string"
+                    "description": "Token string itself",
+                    "type": "string",
+                    "example": "somelong.token.string"
                 }
             }
         },
@@ -109,13 +179,19 @@ const docTemplate = `{
             ],
             "properties": {
                 "email": {
-                    "type": "string"
+                    "description": "Required, email must be valid",
+                    "type": "string",
+                    "example": "example@gmail.com"
                 },
                 "password": {
-                    "type": "string"
+                    "description": "Required, password must meet certain requirements: must has upper case letters, lower case letters and digits",
+                    "type": "string",
+                    "example": "Password1234"
                 },
                 "username": {
-                    "type": "string"
+                    "description": "Required, user's username",
+                    "type": "string",
+                    "example": "linuxflight"
                 }
             }
         },
@@ -123,10 +199,20 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "tokens": {
-                    "$ref": "#/definitions/dto.AuthTokens"
+                    "description": "Two JWT tokens: Access token and Refresh token",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.AuthTokens"
+                        }
+                    ]
                 },
                 "user": {
-                    "$ref": "#/definitions/dto.UserReturn"
+                    "description": "User object",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/dto.UserReturn"
+                        }
+                    ]
                 }
             }
         },
@@ -134,19 +220,29 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "email": {
-                    "type": "string"
+                    "description": "User's email",
+                    "type": "string",
+                    "example": "example@gmail.com"
                 },
                 "id": {
-                    "type": "string"
+                    "description": "User ID",
+                    "type": "string",
+                    "example": "123"
                 },
                 "role": {
-                    "type": "string"
+                    "description": "User's role (e.g. \"Client\", \"Manager\" etc)",
+                    "type": "string",
+                    "example": "manager"
                 },
                 "username": {
-                    "type": "string"
+                    "description": "User's username",
+                    "type": "string",
+                    "example": "linuxflight"
                 },
                 "verified_email": {
-                    "type": "boolean"
+                    "description": "Boll variable showing, whether user's email is verified or not",
+                    "type": "boolean",
+                    "example": true
                 }
             }
         }
