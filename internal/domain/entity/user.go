@@ -11,7 +11,7 @@ type User struct {
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 
-	Email            string  `json:"email" gorm:"uniqueIndex"`
+	Email            string  `json:"email" gorm:"index"`
 	VerifiedEmail    bool    `json:"verified_email" gorm:"default:false;not null"`
 	VerificationCode string  `json:"-" gorm:"default:'NULL';not null"`
 	Password         []byte  `json:"-"`

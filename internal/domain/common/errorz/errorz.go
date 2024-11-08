@@ -3,7 +3,7 @@ package errorz
 import "errors"
 
 var (
-	EmailAlreadyExists = errors.New("email already exists")
-	AuthHeaderIsEmpty  = errors.New("auth header is empty")
-	Forbidden          = errors.New("forbidden")
+	EmailAlreadyTaken = errors.New("email already taken")
+	AuthHeaderIsEmpty = errors.New("auth header is empty")
+	Forbidden         = errors.New("forbidden")
 )
