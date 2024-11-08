@@ -14,12 +14,26 @@ definitions:
       message:
         type: string
     type: object
+  dto.HTTPStatus:
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+    type: object
   dto.Token:
     properties:
       expires:
         type: string
       token:
         type: string
+    type: object
+  dto.UserCode:
+    properties:
+      code:
+        type: string
+    required:
+    - code
     type: object
   dto.UserLogin:
     properties:
@@ -185,21 +199,25 @@ paths:
       - application/json
       description: Verify a user account with a code, sent to user's email
       parameters:
-      - default: Bearer <Add access token here>
-        description: Insert your access token
-        in: header
-        name: Authorization
+      - description: User's email code
+        in: body
+        name: body
         required: true
-        type: string
+        schema:
+          $ref: '#/definitions/dto.UserCode'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/dto.Token'
+            $ref: '#/definitions/dto.HTTPStatus'
         "400":
           description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "401":
+          description: Unauthorized
           schema:
             $ref: '#/definitions/dto.HTTPError'
         "403":
@@ -211,13 +229,14 @@ paths:
           schema:
             $ref: '#/definitions/dto.HTTPError'
       security:
-      - JWT: []
+      - Bearer: []
       summary: Verify user account
       tags:
       - user
 securityDefinitions:
-  JWT:
+  Bearer:
+    description: '"Type ''Bearer TOKEN'' to correctly set the API Key"'
     in: header
-    name: JWT
+    name: Authorization
     type: apiKey
 swagger: "2.0"

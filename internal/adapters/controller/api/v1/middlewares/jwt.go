@@ -3,7 +3,6 @@ package middlewares
 import (
 	"context"
 	"github.com/gofiber/fiber/v2"
-	"github.com/spf13/viper"
 	"webTemplate/cmd/app"
 	"webTemplate/internal/adapters/config"
 	"webTemplate/internal/adapters/database/postgres"
@@ -40,19 +39,11 @@ func (h MiddlewareHandler) IsAuthenticated(tokenType string, requiredRights ...s
 	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
 
-		id, errVerify := auth.VerifyToken(authHeader, viper.GetString("service.backend.jwt.secret"), tokenType)
-		if errVerify != nil {
+		user, fetchErr := auth.GetUserFromJWT(authHeader, tokenType, c.Context(), h.userService.GetByID)
+		if fetchErr != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
 				"success": false,
-				"message": errVerify.Error(),
-			})
-		}
-
-		user, errGetUser := h.userService.GetByID(c.Context(), id)
-		if errGetUser != nil {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"success": false,
-				"message": errGetUser.Error(),
+				"message": fetchErr.Error(),
 			})
 		}
 

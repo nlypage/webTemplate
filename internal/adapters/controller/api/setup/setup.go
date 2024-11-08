@@ -7,6 +7,8 @@ import (
 	"github.com/spf13/viper"
 	"webTemplate/cmd/app"
 	v1 "webTemplate/internal/adapters/controller/api/v1"
+	"webTemplate/internal/adapters/controller/api/v1/middlewares"
+	"webTemplate/internal/domain/utils/auth"
 )
 
 func Setup(app *app.App) {
@@ -26,21 +28,9 @@ func Setup(app *app.App) {
 	// Setup api v1 routes
 	apiV1 := app.Fiber.Group("/api/v1")
 
-	//middlewareHandler := middlewares.NewMiddlewareHandler(app)
+	middlewareHandler := middlewares.NewMiddlewareHandler(app)
 	//
 	// Setup user routes
 	userHandler := v1.NewUserHandler(app)
-	userHandler.Setup(apiV1)
-
-	//
-	//// Setup question routes
-	//questionHandler := v1.NewQuestionHandler(app)
-	//questionHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
-	//
-	//// Setup conference routes
-	//conferenceHandler := v1.NewConferenceHandler(app)
-	//conferenceHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
-	//
-	//eventHandler := v1.NewEventHandler(app)
-	//eventHandler.Setup(apiV1, middlewareHandler.IsAuthenticated)
+	userHandler.Setup(apiV1, middlewareHandler.IsAuthenticated(auth.TokenTypeAccess))
 }

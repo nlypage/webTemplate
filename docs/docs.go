@@ -179,7 +179,7 @@ const docTemplate = `{
             "post": {
                 "security": [
                     {
-                        "JWT": []
+                        "Bearer": []
                     }
                 ],
                 "description": "Verify a user account with a code, sent to user's email",
@@ -195,23 +195,30 @@ const docTemplate = `{
                 "summary": "Verify user account",
                 "parameters": [
                     {
-                        "type": "string",
-                        "default": "Bearer \u003cAdd access token here\u003e",
-                        "description": "Insert your access token",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
+                        "description": "User's email code",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UserCode"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/dto.Token"
+                            "$ref": "#/definitions/dto.HTTPStatus"
                         }
                     },
                     "400": {
                         "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HTTPError"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
                         "schema": {
                             "$ref": "#/definitions/dto.HTTPError"
                         }
@@ -255,6 +262,17 @@ const docTemplate = `{
                 }
             }
         },
+        "dto.HTTPStatus": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.Token": {
             "type": "object",
             "properties": {
@@ -262,6 +280,17 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.UserCode": {
+            "type": "object",
+            "required": [
+                "code"
+            ],
+            "properties": {
+                "code": {
                     "type": "string"
                 }
             }
@@ -333,9 +362,10 @@ const docTemplate = `{
         }
     },
     "securityDefinitions": {
-        "JWT": {
+        "Bearer": {
+            "description": "\"Type 'Bearer TOKEN' to correctly set the API Key\"",
             "type": "apiKey",
-            "name": "JWT",
+            "name": "Authorization",
             "in": "header"
         }
     }

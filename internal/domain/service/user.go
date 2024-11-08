@@ -45,3 +45,7 @@ func (s *userService) GetByEmail(ctx context.Context, email string) (*entity.Use
 func (s *userService) GetByID(ctx context.Context, id string) (*entity.User, error) {
 	return s.storage.GetByID(ctx, id)
 }
+
+func (s *userService) Update(ctx context.Context, user *entity.User) (*entity.User, error) {
+	return s.storage.Update(ctx, user)
+}

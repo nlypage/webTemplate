@@ -6,6 +6,10 @@ type UserRegister struct {
 	Username string `json:"username" validate:"required,username"`
 }
 
+type UserCode struct {
+	Code string `json:"code" validate:"required,code"`
+}
+
 type UserReturn struct {
 	ID            string `json:"id"`
 	Email         string `json:"email"`

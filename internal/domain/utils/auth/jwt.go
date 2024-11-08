@@ -1,12 +1,14 @@
 package auth
 
 import (
+	"context"
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
 	"strings"
 	"time"
 	"webTemplate/internal/domain/common/errorz"
+	"webTemplate/internal/domain/entity"
 )
 
 func VerifyToken(authHeader, secret, tokenType string) (string, error) {
@@ -39,6 +41,20 @@ func VerifyToken(authHeader, secret, tokenType string) (string, error) {
 	}
 
 	return userID, nil
+}
+
+func GetUserFromJWT(jwt, tokenType string, context context.Context, getUser func(context.Context, string) (*entity.User, error)) (*entity.User, error) {
+	id, errVerify := VerifyToken(jwt, viper.GetString("service.backend.jwt.secret"), tokenType)
+	if errVerify != nil {
+		return &entity.User{}, errVerify
+	}
+
+	user, errGetUser := getUser(context, id)
+	if errGetUser != nil {
+		return &entity.User{}, errGetUser
+	}
+
+	return user, nil
 }
 
 func GenerateToken(userID string, expires time.Time, tokenType string) (string, error) {

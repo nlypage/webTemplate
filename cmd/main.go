@@ -15,9 +15,10 @@ import (
 
 // @host      localhost:3000
 // @BasePath  /api/v1
-// @securityDefinitions.apikey JWT
+// @securityDefinitions.apikey Bearer
 // @in header
-// @name JWT
+// @name Authorization
+// @description "Type 'Bearer TOKEN' to correctly set the API Key"
 func main() {
 	appConfig := config.Configure()
 	mainApp := app.New(appConfig)
