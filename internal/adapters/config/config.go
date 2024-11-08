@@ -15,6 +15,13 @@ import (
 
 type Config struct {
 	Database *gorm.DB
+	Maileroo MailerooConfig
+}
+
+type MailerooConfig struct {
+	SendingApiKey      string
+	VerificationApiKey string
+	FromEmail          string
 }
 
 func initConfig() {
@@ -65,6 +72,23 @@ func Configure() *Config {
 		viper.GetString("settings.timezone"),
 	)
 
+	logger.Log.Debug("Configuring maileroo")
+	from, fromExists := os.LookupEnv("MAILEROO_FROM")
+	vKey, vKeyExists := os.LookupEnv("MAILEROO_VERIFICATION_KEY")
+	sKey, sKeyExists := os.LookupEnv("MAILEROO_SENDING_KEY")
+	logger.Log.Debugf("From: \"%s\"", from)
+	logger.Log.Debugf("VKey: \"%s\"", vKey)
+	logger.Log.Debugf("SKey: \"%s\"", sKey)
+	if !fromExists || !vKeyExists || !sKeyExists {
+		logger.Log.Panic("Maileroo configuration not found")
+	}
+	logger.Log.Debug("Maileroo set up")
+	maileroo := MailerooConfig{
+		SendingApiKey:      sKey,
+		VerificationApiKey: vKey,
+		FromEmail:          from,
+	}
+
 	logger.Log.Debugf("dsn: %s", dsn)
 	logger.Log.Debug("Connecting to postgres...")
 	database, errConnect := gorm.Open(postgres.Open(dsn), gormConfig)
@@ -82,5 +106,6 @@ func Configure() *Config {
 	logger.Log.Info("Database initialized")
 	return &Config{
 		Database: database,
+		Maileroo: maileroo,
 	}
 }

@@ -7,6 +7,10 @@ type UserRegister struct {
 	Username string `json:"username" validate:"required,username" example:"linuxflight"`  // Required, user's username
 }
 
+type UserCode struct {
+	Code string `json:"code" validate:"required,code"`
+}
+
 type UserReturn struct {
 	ID            string `json:"id" example:"123"`                  // User ID
 	Email         string `json:"email" example:"example@gmail.com"` // User's email

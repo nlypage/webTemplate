@@ -24,13 +24,15 @@ func NewUserService(storage userStorage) *userService {
 	return &userService{storage: storage}
 }
 
-func (s *userService) Create(ctx context.Context, registerReq dto.UserRegister) (*entity.User, error) {
+func (s *userService) Create(ctx context.Context, registerReq dto.UserRegister, code string) (*entity.User, error) {
 	if _, err := s.storage.GetByEmail(ctx, registerReq.Email); err == nil {
 		return nil, errorz.EmailAlreadyExists
 	}
 
 	user := entity.User{
-		Email: registerReq.Email,
+		Email:            registerReq.Email,
+		Username:         registerReq.Username,
+		VerificationCode: code,
 	}
 	user.SetPassword(registerReq.Password)
 	return s.storage.Create(ctx, user)
@@ -38,4 +40,12 @@ func (s *userService) Create(ctx context.Context, registerReq dto.UserRegister) 
 
 func (s *userService) GetByEmail(ctx context.Context, email string) (*entity.User, error) {
 	return s.storage.GetByEmail(ctx, email)
+}
+
+func (s *userService) GetByID(ctx context.Context, id string) (*entity.User, error) {
+	return s.storage.GetByID(ctx, id)
+}
+
+func (s *userService) Update(ctx context.Context, user *entity.User) (*entity.User, error) {
+	return s.storage.Update(ctx, user)
 }

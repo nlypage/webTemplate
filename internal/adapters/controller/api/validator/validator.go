@@ -34,6 +34,16 @@ func New() *Validator {
 		return len(fl.Field().String()) >= 4 && len(fl.Field().String()) <= 20
 	})
 
+	_ = newValidator.RegisterValidation("code", func(fl validator.FieldLevel) bool {
+		code := fl.Field().String()
+
+		hasLength := len(code) == 6
+		hasUppercase := strings.ToLower(code) != code
+		hasDigit := strings.IndexFunc(code, func(c rune) bool { return unicode.IsDigit(c) }) != -1
+
+		return hasLength && (hasUppercase || hasDigit)
+	})
+
 	_ = newValidator.RegisterValidation("password", func(fl validator.FieldLevel) bool {
 		password := fl.Field().String()
 		hasMinLength := len(password) >= 8

@@ -24,6 +24,10 @@ service: # изменять в случае изменений в .env
       access-token-expiration: "30" # в минутах
       refresh-token-expiration: "43200" #  30 дней в минутах
 
+roles:
+  user: [""]
+  admin: [""]
+
 settings:
   debug: true # включение / выключение дебага
   listen-tls: false # false - http, true - https (при первом старте до выпуска сертификатов - ставить false, после - true)
