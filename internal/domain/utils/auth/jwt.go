@@ -4,10 +4,20 @@ import (
 	"errors"
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/viper"
+	"strings"
 	"time"
 )
 
 func VerifyToken(tokenStr, secret, tokenType string) (string, error) {
+	tokenParts := strings.Split(tokenStr, " ")
+	if len(tokenParts) != 2 {
+		return "", errors.New("token format error")
+	}
+
+	if tokenParts[0] != "Bearer" {
+		return "", errors.New("token format error")
+	}
+
 	token, err := jwt.Parse(tokenStr, func(_ *jwt.Token) (interface{}, error) {
 		return []byte(secret), nil
 	})

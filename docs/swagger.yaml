@@ -179,4 +179,45 @@ paths:
       summary: Register a new user
       tags:
       - user
+  /user/verify:
+    post:
+      consumes:
+      - application/json
+      description: Verify a user account with a code, sent to user's email
+      parameters:
+      - default: Bearer <Add access token here>
+        description: Insert your access token
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Token'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.HTTPError'
+      security:
+      - JWT: []
+      summary: Verify user account
+      tags:
+      - user
+securityDefinitions:
+  JWT:
+    in: header
+    name: JWT
+    type: apiKey
 swagger: "2.0"

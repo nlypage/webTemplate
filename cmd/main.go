@@ -15,6 +15,9 @@ import (
 
 // @host      localhost:3000
 // @BasePath  /api/v1
+// @securityDefinitions.apikey JWT
+// @in header
+// @name JWT
 func main() {
 	appConfig := config.Configure()
 	mainApp := app.New(appConfig)

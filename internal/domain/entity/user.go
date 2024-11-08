@@ -11,12 +11,13 @@ type User struct {
 	CreatedAt time.Time `json:"-"`
 	UpdatedAt time.Time `json:"-"`
 
-	Email         string  `json:"email" gorm:"uniqueIndex"`
-	VerifiedEmail bool    `json:"verified_email" gorm:"default:false;not null"`
-	Password      []byte  `json:"-"`
-	Role          string  `json:"role" gorm:"default:user;not null"`
-	Token         []Token `json:"-" gorm:"foreignKey:user_id;references:id"`
-	Username      string  `json:"username"`
+	Email            string  `json:"email" gorm:"uniqueIndex"`
+	VerifiedEmail    bool    `json:"verified_email" gorm:"default:false;not null"`
+	VerificationCode string  `json:"-" gorm:"default:'NULL';not null"`
+	Password         []byte  `json:"-"`
+	Role             string  `json:"role" gorm:"default:user;not null"`
+	Token            []Token `json:"-" gorm:"foreignKey:user_id;references:id"`
+	Username         string  `json:"username"`
 }
 
 // HashedPassword is a function to hash the password.
